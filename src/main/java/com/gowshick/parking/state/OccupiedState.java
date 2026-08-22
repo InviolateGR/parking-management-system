@@ -27,4 +27,9 @@ public class OccupiedState implements SlotState {
     public boolean isFree() {
         return false;
     }
+
+    @Override
+    public void release(ParkingSlot slot) {
+        throw new SlotNotAvailableException("Slot " + slot.getSlotId() + " is occupied, not reserved — cannot release a reservation.");
+    }
 }

@@ -27,4 +27,9 @@ public class FreeState implements SlotState {
     public boolean isFree() {
         return true;
     }
+
+    @Override
+    public void release(ParkingSlot slot) {
+        throw new SlotNotAvailableException("Slot " + slot.getSlotId() + " is already free — nothing to release.");
+    }
 }

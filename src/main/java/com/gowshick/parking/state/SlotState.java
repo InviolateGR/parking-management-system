@@ -8,5 +8,6 @@ public interface SlotState {
     void park(ParkingSlot slot, Vehicle vehicle);
     void vacate(ParkingSlot slot);
     void reserve(ParkingSlot slot, Reservation reservation);
+    void release(ParkingSlot slot);
     boolean isFree();
 }

@@ -5,6 +5,7 @@ import com.gowshick.parking.exception.InvalidTicketException;
 import com.gowshick.parking.exception.SlotNotAvailableException;
 import com.gowshick.parking.model.*;
 import com.gowshick.parking.repository.BillRepository;
+import com.gowshick.parking.repository.ReservationRepository;
 import com.gowshick.parking.repository.TicketRepository;
 import com.gowshick.parking.strategy.PricingStrategy;
 import com.gowshick.parking.util.IdGenerator;
@@ -13,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -24,28 +25,25 @@ public class ParkingService {
     private final ParkingLot parkingLot;
     private final TicketRepository ticketRepository;
     private final BillRepository billRepository;
+    private final ReservationRepository reservationRepository;
     private final Map<VehicleType, PricingStrategy> pricingStrategies;
 
     public ParkingService(ParkingLot parkingLot,
                            TicketRepository ticketRepository,
                            BillRepository billRepository,
+                           ReservationRepository reservationRepository,
                            Map<VehicleType, PricingStrategy> pricingStrategies) {
         this.parkingLot = parkingLot;
         this.ticketRepository = ticketRepository;
         this.billRepository = billRepository;
+        this.reservationRepository = reservationRepository;
         this.pricingStrategies = pricingStrategies;
     }
 
     public Ticket parkVehicle(Vehicle vehicle) {
-        Optional<ParkingSlot> slotOpt = parkingLot.findAvailableSlot(vehicle.getVehicleType());
+        ParkingSlot slot = findReservedSlotFor(vehicle)
+                .orElseGet(() -> findWalkInSlotFor(vehicle));
 
-        if (slotOpt.isEmpty()) {
-            logger.warn("Parking denied — no available slot for vehicle {}", vehicle);
-            throw new SlotNotAvailableException(
-                "No available slot for vehicle type: " + vehicle.getVehicleType());
-        }
-
-        ParkingSlot slot = slotOpt.get();
         slot.getState().park(slot, vehicle);
 
         ParkingFloor floor = findFloorForSlot(slot);
@@ -64,6 +62,26 @@ public class ParkingService {
         logger.info("Vehicle parked successfully: {}", ticket);
 
         return ticket;
+    }
+
+    private Optional<ParkingSlot> findReservedSlotFor(Vehicle vehicle) {
+        List<Reservation> reservations = reservationRepository.findAll();
+
+        return reservations.stream()
+                .filter(Reservation::isActive)
+                .filter(r -> r.getVehicle().equals(vehicle))
+                .filter(r -> !r.isGracePeriodExpired(LocalDateTime.now()))
+                .map(Reservation::getSlot)
+                .findFirst();
+    }
+
+    private ParkingSlot findWalkInSlotFor(Vehicle vehicle) {
+        return parkingLot.findAvailableSlot(vehicle.getVehicleType())
+                .orElseThrow(() -> {
+                    logger.warn("Parking denied — no available slot for vehicle {}", vehicle);
+                    return new SlotNotAvailableException(
+                            "No available slot for vehicle type: " + vehicle.getVehicleType());
+                });
     }
 
     public Bill exitVehicle(String ticketId, com.gowshick.parking.enums.PaymentMethod paymentMethod) {

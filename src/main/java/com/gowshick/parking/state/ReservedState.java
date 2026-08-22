@@ -42,4 +42,9 @@ public class ReservedState implements SlotState {
     public boolean isFree() {
         return false;
     }
+
+    @Override
+    public void release(ParkingSlot slot) {
+        slot.setState(new FreeState());
+    }
 }
