@@ -13,12 +13,14 @@ import com.gowshick.parking.repository.TicketRepository;
 import com.gowshick.parking.repository.file.FileBillRepository;
 import com.gowshick.parking.repository.file.FileReservationRepository;
 import com.gowshick.parking.repository.file.FileTicketRepository;
+import com.gowshick.parking.service.AnalyticsService;
 import com.gowshick.parking.service.ParkingService;
 import com.gowshick.parking.service.ReservationService;
 import com.gowshick.parking.strategy.BikePricingStrategy;
 import com.gowshick.parking.strategy.CarPricingStrategy;
 import com.gowshick.parking.strategy.PricingStrategy;
 import com.gowshick.parking.strategy.TruckPricingStrategy;
+import com.gowshick.parking.service.AnalyticsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,5 +95,9 @@ public class App {
         // Simulate the reserved vehicle arriving and parking using its reservation
         Ticket reservedTicket = parkingService.parkVehicle(reservingCar);
         System.out.println("Reserved vehicle parked: " + reservedTicket);
+        
+        // --- Analytics ---
+        AnalyticsService analyticsService = new AnalyticsService(ticketRepository, billRepository);
+        analyticsService.printSummary();
     }
 }
