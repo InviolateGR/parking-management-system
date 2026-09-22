@@ -5,3 +5,4 @@ target/
 *.iml
 logs/*.log
 data/*.txt
+data/*.db
