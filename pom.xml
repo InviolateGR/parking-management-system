@@ -14,17 +14,16 @@
 
 <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  <maven.compiler.source>25</maven.compiler.source>
-  <maven.compiler.target>25</maven.compiler.target>
+  <maven.compiler.release>17</maven.compiler.release>
 </properties>
 
 <dependencies>
-    <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <version>4.13.2</version>
-        <scope>test</scope>
-    </dependency>
+  <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>5.10.2</version>
+      <scope>test</scope>
+  </dependency>
 
     <!-- Logging: SLF4J API + Logback implementation (industry standard combo) -->
     <dependency>
