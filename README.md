@@ -122,3 +122,36 @@ Being upfront about scope boundaries — these were deliberate decisions, not ov
 
 Gowshick — B.E. Electronics and Communication Engineering graduate, building toward Software Engineer / Java Developer roles.
 
+## How to Use
+
+Once the application is running (`mvn exec:java`), you'll interact entirely through the console menu.
+
+### Parking a vehicle
+1. Select **1**
+2. Enter the vehicle type: `BIKE`, `CAR`, or `TRUCK`
+3. Enter a registration number
+4. The system finds the nearest compatible free slot and issues a ticket — **copy the full ticket ID printed** (e.g., `TICKET-5B941C4D`), you'll need it to exit later
+
+### Exiting a vehicle
+1. Select **2**
+2. Enter the **exact full ticket ID** from step above (including the `TICKET-` prefix)
+3. Enter a payment method: `CASH`, `CARD`, or `UPI`
+4. The system calculates the fare based on parked duration and vehicle type, and generates a bill
+
+### Reserving a slot
+1. Select **3**
+2. Enter the vehicle type and registration number
+3. Enter the reservation duration in hours
+4. A slot is reserved immediately; when that same vehicle later "parks" (option 1), it will automatically use its reserved slot instead of searching for a walk-in slot — as long as it arrives within the 30-minute grace period
+
+### Viewing floor status
+Select **4** to see every slot across all floors, along with its current state (`FreeState`, `OccupiedState`, or `ReservedState`).
+
+### Viewing analytics
+Select **5** to see cumulative totals: total vehicles parked, total revenue, average parking duration, vehicle count by floor, and the peak-occupancy floor — all computed live from the persisted `data/parking.db` SQLite database, across every run since the database was created.
+
+### Exiting the application
+Select **6** to quit cleanly.
+
+### Resetting stored data
+The database file lives at `data/parking.db`. To start with a completely clean slate (e.g., before a demo), delete this file before running the app again — it will be recreated automatically with an empty schema on next startup.
