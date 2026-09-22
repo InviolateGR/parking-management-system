@@ -40,9 +40,12 @@ public class App {
 
         Map<VehicleType, PricingStrategy> pricingStrategies = buildPricingStrategies();
 
-        TicketRepository ticketRepository = new FileTicketRepository("data/tickets.txt", parkingLot);
-        BillRepository billRepository = new FileBillRepository("data/bills.txt", parkingLot);
-        ReservationRepository reservationRepository = new FileReservationRepository("data/reservations.txt", parkingLot);
+        com.gowshick.parking.repository.sqlite.DatabaseInitializer dbInitializer = new com.gowshick.parking.repository.sqlite.DatabaseInitializer("data/parking.db");
+        dbInitializer.initializeSchema();
+
+        TicketRepository ticketRepository = new com.gowshick.parking.repository.sqlite.SQLiteTicketRepository(dbInitializer, parkingLot);
+        BillRepository billRepository = new com.gowshick.parking.repository.sqlite.SQLiteBillRepository(dbInitializer, parkingLot);
+        ReservationRepository reservationRepository = new com.gowshick.parking.repository.sqlite.SQLiteReservationRepository(dbInitializer, parkingLot);
 
         ParkingService parkingService = new ParkingService(
                 parkingLot, ticketRepository, billRepository, reservationRepository, pricingStrategies
